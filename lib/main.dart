@@ -15,72 +15,113 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Course Explorer - Tahap 13',
+      title: 'Course Explorer - Tahap 14',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const FeedbackFormPage(),
+      home: const FeedbackPage(),
     );
   }
 }
 
-class FeedbackFormPage extends StatefulWidget {
-  const FeedbackFormPage({super.key});
+class FeedbackPage extends StatefulWidget {
+  const FeedbackPage({super.key});
 
   @override
-  State<FeedbackFormPage> createState() => _FeedbackFormPageState();
+  State<FeedbackPage> createState() => _FeedbackPageState();
 }
 
-class _FeedbackFormPageState extends State<FeedbackFormPage> {
-  // GlobalKey untuk mengontrol dan memvalidasi Form
+class _FeedbackPageState extends State<FeedbackPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  // Controller dengan nilai awal identitas praktikan
-  late final TextEditingController _nameController;
-  late final TextEditingController _nimController;
   final TextEditingController _commentController = TextEditingController();
-
-  String _submittedFeedback = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: studentName);
-    _nimController = TextEditingController(text: studentId);
-  }
+  bool _isLoading = false;
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _nimController.dispose();
     _commentController.dispose();
     super.dispose();
   }
 
-  void _submitForm() {
-    // Validasi seluruh TextFormField di dalam Form
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _submittedFeedback =
-            'Umpan balik dari ${_nameController.text} (${_nimController.text}):\n"${_commentController.text}"';
-      });
+  // 1. Fungsi menampilkan AlertDialog konfirmasi sebelum aksi penting
+  Future<void> _handleConfirmSubmit() async {
+    // Validasi form terlebih dahulu
+    if (!_formKey.currentState!.validate()) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Form valid! Feedback berhasil dikirim.'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
+    // Munculkan dialog konfirmasi
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.help_outline, color: Colors.blue),
+              SizedBox(width: 8),
+              Text('Konfirmasi Kirim'),
+            ],
+          ),
+          content: Text(
+            'Apakah Anda yakin ingin mengirim ulasan untuk mahasiswa:\n$studentName ($studentId)?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Ya, Lanjutkan'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // Jika pengguna menekan 'Ya, Lanjutkan'
+    if (confirm == true) {
+      _executeSubmitProcess();
     }
+  }
+
+  // 2. Fungsi proses asinkron dengan CircularProgressIndicator dan SnackBar
+  Future<void> _executeSubmitProcess() async {
+    setState(() => _isLoading = true);
+
+    // Simulasi jeda waktu kirim (loading) selama 1.5 detik
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+    _commentController.clear();
+
+    // 3. Tampilkan SnackBar sukses
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.white),
+            SizedBox(width: 8),
+            Expanded(child: Text('Data berhasil disimpan ke sistem!')),
+          ],
+        ),
+        backgroundColor: Colors.green.shade700,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Form Feedback Kursus'),
+        title: const Text('Feedback & Dialog'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
@@ -91,7 +132,7 @@ class _FeedbackFormPageState extends State<FeedbackFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Identitas Mahasiswa di Header
+              // Banner Identitas Mahasiswa
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
@@ -102,7 +143,7 @@ class _FeedbackFormPageState extends State<FeedbackFormPage> {
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.badge, color: Colors.blue),
+                    Icon(Icons.person, color: Colors.blue),
                     SizedBox(width: 8),
                     Text(
                       'Praktikan: $studentId - $studentName',
@@ -112,108 +153,64 @@ class _FeedbackFormPageState extends State<FeedbackFormPage> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // 1. Field Nama (Default terisi identitas)
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nama Mahasiswa',
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Nama wajib diisi';
-                  }
-                  return null;
-                },
+              const Text(
+                'Tulis Ulasan Kursus:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
-
-              // 2. Field NIM (Default terisi identitas)
-              TextFormField(
-                controller: _nimController,
-                decoration: const InputDecoration(
-                  labelText: 'NIM',
-                  prefixIcon: Icon(Icons.numbers),
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'NIM wajib diisi';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // 3. Field Komentar / Feedback (Wajib minimal 5 karakter)
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _commentController,
-                maxLines: 4,
+                maxLines: 3,
                 decoration: const InputDecoration(
-                  labelText: 'Komentar / Feedback Kursus',
-                  alignLabelWithHint: true,
-                  hintText: 'Tuliskan ulasan minimal 5 karakter...',
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 60),
-                    child: Icon(Icons.comment),
-                  ),
+                  hintText: 'Tulis tanggapan Anda minimal 5 karakter...',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Komentar wajib diisi';
-                  }
-                  if (value.trim().length < 5) {
-                    return 'Komentar minimal 5 karakter';
+                  if (value == null || value.trim().length < 5) {
+                    return 'Ulasan minimal 5 karakter';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 24),
 
-              // Tombol Submit Form
+              // Tombol Kirim / Indikator Loading
               SizedBox(
                 width: double.infinity,
                 height: 48,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: _submitForm,
-                  icon: const Icon(Icons.send),
-                  label: const Text(
-                    'Kirim Feedback',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
+                child: _isLoading
+                    ? const Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Text('Menyimpan data...'),
+                          ],
+                        ),
+                      )
+                    : ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: _handleConfirmSubmit,
+                        icon: const Icon(Icons.send),
+                        label: const Text(
+                          'Kirim Ulasan',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
               ),
-              const SizedBox(height: 24),
-
-              // Penampil Hasil Pengiriman
-              if (_submittedFeedback.isNotEmpty) ...[
-                const Divider(),
-                const Text(
-                  'Hasil Validasi & Pengiriman:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.green.shade300),
-                  ),
-                  child: Text(
-                    _submittedFeedback,
-                    style: TextStyle(color: Colors.green.shade900),
-                  ),
-                ),
-              ],
             ],
           ),
         ),
