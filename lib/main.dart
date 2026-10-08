@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Identitas Mahasiswa sesuai ketentuan worksheet
+// Identitas Mahasiswa sesuai instruksi worksheet
 const String studentName = 'Suniaramana Mardana Putra';
 const String studentId = '2455011006';
 
@@ -15,124 +15,56 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Course Explorer - Tahap 9',
+      title: 'Course Explorer - Tahap 10',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const CourseListPage(),
+      home: const MainNavigationShell(),
     );
   }
 }
 
-// Data Dummy Course
-final List<Map<String, dynamic>> courseList = [
-  {
-    'title': 'Responsive Layout',
-    'code': 'MOB04',
-    'status': 'Active',
-    'credits': 3,
-    'description': 'Membangun antarmuka adaptif menggunakan MediaQuery, LayoutBuilder, serta penanganan breakpoint ukuran layar.',
-  },
-  {
-    'title': 'Navigation',
-    'code': 'MOB05',
-    'status': 'Planned',
-    'credits': 2,
-    'description': 'Mempelajari navigasi multi-screen, tumpukan rute (stack), passing data antar-halaman, dan returning result.',
-  },
-  {
-    'title': 'Interaction',
-    'code': 'MOB06',
-    'status': 'Planned',
-    'credits': 3,
-    'description': 'Menerapkan interaksi pengguna menggunakan buttons, InkWell ripple, form validation, dan feedback widget.',
-  },
-];
+// Shell Navigasi Utama (StatefulWidget)
+class MainNavigationShell extends StatefulWidget {
+  const MainNavigationShell({super.key});
 
-// 1. Layar Daftar Course (Menerima returning data dengan await)
-class CourseListPage extends StatelessWidget {
-  const CourseListPage({super.key});
+  @override
+  State<MainNavigationShell> createState() => _MainNavigationShellState();
+}
+
+class _MainNavigationShellState extends State<MainNavigationShell> {
+  int _currentIndex = 0;
+
+  // Daftar tiga layar tujuan utama
+  final List<Widget> _pages = const [HomePage(), CoursesPage(), ProfilePage()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Course Explorer'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Banner Identitas Mahasiswa
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: Colors.blue.shade50,
-            child: const Text(
-              '$studentId - $studentName',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
+      body: _pages[_currentIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (int index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Home',
           ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(
-              'Daftar Course (Tahap 9 - Return Data):',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
+          NavigationDestination(
+            icon: Icon(Icons.school_outlined),
+            selectedIcon: Icon(Icons.school),
+            label: 'Courses',
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: courseList.length,
-              itemBuilder: (context, index) {
-                final course = courseList[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 6,
-                  ),
-                  elevation: 2,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.blue.shade100,
-                      child: Text('${index + 1}'),
-                    ),
-                    title: Text(
-                      course['title'],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(
-                      '${course['code']} • ${course['credits']} SKS',
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
-                    // Menunggu hasil kembalian dari CourseDetailPage
-                    onTap: () async {
-                      final result = await Navigator.push<bool>(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              CourseDetailPage(course: course),
-                        ),
-                      );
-
-                      // Jika user menekan tombol 'Pilih/Favorite' (result == true)
-                      if (context.mounted && result == true) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${course['title']} ditambahkan ke Favorite oleh $studentName!',
-                            ),
-                            backgroundColor: Colors.green.shade700,
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                );
-              },
-            ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
       ),
@@ -140,17 +72,15 @@ class CourseListPage extends StatelessWidget {
   }
 }
 
-// 2. Layar Detail Course (Mengirimkan hasil kembali via pop)
-class CourseDetailPage extends StatelessWidget {
-  final Map<String, dynamic> course;
-
-  const CourseDetailPage({super.key, required this.course});
+// 1. Destinasi: Home Page
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(course['title']),
+        title: const Text('Course Explorer - Home'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
@@ -159,75 +89,132 @@ class CourseDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Identitas Mahasiswa di Layar Detail
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.shade200),
               ),
-              child: const Row(
-                children: [
-                  Icon(Icons.badge, color: Colors.blue),
-                  SizedBox(width: 8),
-                  Text(
-                    'Praktikan: $studentId - $studentName',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
+              child: const Text(
+                'Identitas: $studentId - $studentName',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              course['title'],
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Kode: ${course['code']} | Beban: ${course['credits']} SKS',
-              style: const TextStyle(fontSize: 16, color: Colors.black54),
-            ),
-            const Divider(height: 32),
             const Text(
-              'Deskripsi Materi:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              'Selamat Datang di Course Explorer',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Text(
-              course['description'] ?? '-',
-              style: const TextStyle(fontSize: 15, height: 1.5),
+            const Text(
+              'Gunakan menu bar di bawah untuk berpindah antar halaman Home, Courses, dan Profile secara terstruktur.',
+              style: TextStyle(fontSize: 14, color: Colors.black54),
             ),
-            const Spacer(),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-            // Tombol 'Pilih/Favorite' yang mengembalikan data boolean true
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber.shade700,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () {
-                  // Kembali sambil mengirim nilai true
-                  Navigator.pop(context, true);
-                },
-                icon: const Icon(Icons.star),
-                label: const Text(
-                  'Pilih/Favorite',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+// 2. Destinasi: Courses Page (Daftar Mata Kuliah)
+class CoursesPage extends StatelessWidget {
+  const CoursesPage({super.key});
+
+  final List<Map<String, dynamic>> courses = const [
+    {'title': 'Responsive Layout', 'code': 'MOB04', 'status': 'Active'},
+    {'title': 'Navigation', 'code': 'MOB05', 'status': 'Planned'},
+    {'title': 'Interaction', 'code': 'MOB06', 'status': 'Planned'},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Daftar Course'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: courses.length,
+        itemBuilder: (context, index) {
+          final item = courses[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.blue.shade100,
+                child: Text('${index + 1}'),
+              ),
+              title: Text(
+                item['title'],
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text('Kode: ${item['code']}'),
+              trailing: Text(
+                item['status'],
+                style: TextStyle(
+                  color: item['status'] == 'Active'
+                      ? Colors.green
+                      : Colors.orange,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            // Tombol kembali biasa tanpa mengirim nilai (null)
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Batal / Kembali'),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// 3. Destinasi: Profile Page (Memuat Identitas Lengkap Mahasiswa)
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profil Mahasiswa'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            const Center(
+              child: CircleAvatar(
+                radius: 40,
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.person, size: 45, color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              studentName,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'NIM: $studentId',
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
+            ),
+            const Divider(height: 36),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.class_),
+                title: const Text('Kelas'),
+                subtitle: const Text('TRPL 5A'),
+              ),
+            ),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.laptop_chromebook),
+                title: const Text('Mata Kuliah'),
+                subtitle: const Text('Pemrograman Mobile - Pertemuan 5'),
               ),
             ),
           ],
