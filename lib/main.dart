@@ -15,59 +15,117 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Course Explorer - Tahap 10',
+      title: 'Course Explorer - Tahap 11',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const MainNavigationShell(),
+      home: const AdaptiveNavigationShell(),
     );
   }
 }
 
-// Shell Navigasi Utama (StatefulWidget)
-class MainNavigationShell extends StatefulWidget {
-  const MainNavigationShell({super.key});
+// Shell Navigasi Adaptif
+class AdaptiveNavigationShell extends StatefulWidget {
+  const AdaptiveNavigationShell({super.key});
 
   @override
-  State<MainNavigationShell> createState() => _MainNavigationShellState();
+  State<AdaptiveNavigationShell> createState() =>
+      _AdaptiveNavigationShellState();
 }
 
-class _MainNavigationShellState extends State<MainNavigationShell> {
-  int _currentIndex = 0;
+class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell> {
+  int _selectedIndex = 0;
 
-  // Daftar tiga layar tujuan utama
   final List<Widget> _pages = const [HomePage(), CoursesPage(), ProfilePage()];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Breakpoint: jika lebar < 840px gunakan NavigationBar bawah (Compact/Medium)
+        if (constraints.maxWidth < 840) {
+          return Scaffold(
+            body: _pages[_selectedIndex],
+            bottomNavigationBar: NavigationBar(
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: (index) {
+                setState(() => _selectedIndex = index);
+              },
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home),
+                  label: 'Home',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.school_outlined),
+                  selectedIcon: Icon(Icons.school),
+                  label: 'Courses',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.person_outline),
+                  selectedIcon: Icon(Icons.person),
+                  label: 'Profile',
+                ),
+              ],
+            ),
+          );
+        }
+
+        // Jika lebar >= 840px gunakan NavigationRail di samping kiri (Expanded)
+        return Scaffold(
+          body: Row(
+            children: [
+              NavigationRail(
+                selectedIndex: _selectedIndex,
+                onDestinationSelected: (index) {
+                  setState(() => _selectedIndex = index);
+                },
+                labelType: NavigationRailLabelType.all,
+                leading: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Column(
+                    children: [
+                      const CircleAvatar(
+                        backgroundColor: Colors.blue,
+                        child: Icon(Icons.code, color: Colors.white),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        studentId,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                destinations: const [
+                  NavigationRailDestination(
+                    icon: Icon(Icons.home_outlined),
+                    selectedIcon: Icon(Icons.home),
+                    label: Text('Home'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.school_outlined),
+                    selectedIcon: Icon(Icons.school),
+                    label: Text('Courses'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.person_outline),
+                    selectedIcon: Icon(Icons.person),
+                    label: Text('Profile'),
+                  ),
+                ],
+              ),
+              const VerticalDivider(thickness: 1, width: 1),
+              Expanded(child: _pages[_selectedIndex]),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.school_outlined),
-            selectedIcon: Icon(Icons.school),
-            label: 'Courses',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -95,21 +153,22 @@ class HomePage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.shade200),
               ),
               child: const Text(
                 'Identitas: $studentId - $studentName',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             const Text(
-              'Selamat Datang di Course Explorer',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              'Pola Navigasi Adaptif (Adaptive Shell)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
-              'Gunakan menu bar di bawah untuk berpindah antar halaman Home, Courses, dan Profile secara terstruktur.',
-              style: TextStyle(fontSize: 14, color: Colors.black54),
+              'Ubah ukuran layar atau putar emulator ke mode Landscape untuk melihat perpindahan dari NavigationBar bawah menjadi NavigationRail di samping kiri.',
+              style: TextStyle(fontSize: 14, color: Colors.black87),
             ),
           ],
         ),
@@ -118,7 +177,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// 2. Destinasi: Courses Page (Daftar Mata Kuliah)
+// 2. Destinasi: Courses Page
 class CoursesPage extends StatelessWidget {
   const CoursesPage({super.key});
 
@@ -137,12 +196,12 @@ class CoursesPage extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       body: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(12),
         itemCount: courses.length,
         itemBuilder: (context, index) {
           final item = courses[index];
           return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            margin: const EdgeInsets.symmetric(vertical: 6),
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: Colors.blue.shade100,
@@ -159,7 +218,7 @@ class CoursesPage extends StatelessWidget {
                   color: item['status'] == 'Active'
                       ? Colors.green
                       : Colors.orange,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -170,7 +229,7 @@ class CoursesPage extends StatelessWidget {
   }
 }
 
-// 3. Destinasi: Profile Page (Memuat Identitas Lengkap Mahasiswa)
+// 3. Destinasi: Profile Page
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -205,16 +264,9 @@ class ProfilePage extends StatelessWidget {
             const Divider(height: 36),
             Card(
               child: ListTile(
-                leading: const Icon(Icons.class_),
+                leading: const Icon(Icons.school),
                 title: const Text('Kelas'),
                 subtitle: const Text('TRPL 5A'),
-              ),
-            ),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.laptop_chromebook),
-                title: const Text('Mata Kuliah'),
-                subtitle: const Text('Pemrograman Mobile - Pertemuan 5'),
               ),
             ),
           ],
