@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../providers/course_provider.dart';
 import '../widgets/course_card.dart';
 import '../widgets/student_header_card.dart';
+import 'course_detail_page.dart';
+import 'favorites_page.dart';
 
 const String studentName = 'Suniaramana Mardana Putra';
 const String studentId = '2455011006';
@@ -17,8 +19,20 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Course Explorer v2 - Modular'),
+        title: const Text('Tahap 13 - Shared Favorites'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.bookmark),
+            tooltip: 'Halaman Favorit',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FavoritesPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -32,7 +46,7 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Daftar Kursus (Modular Architecture):',
+              'Daftar Kursus (Klik card untuk ke detail):',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 10),
@@ -43,14 +57,24 @@ class HomePage extends StatelessWidget {
             else
               Column(
                 children: provider.courses.map((course) {
-                  return CourseCard(
-                    course: course,
-                    isFavorite: provider.isFavorite(course.code),
-                    onFavoriteToggle: () {
-                      context.read<CourseProvider>().toggleFavorite(
-                        course.code,
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CourseDetailPage(course: course),
+                        ),
                       );
                     },
+                    child: CourseCard(
+                      course: course,
+                      isFavorite: provider.isFavorite(course.code),
+                      onFavoriteToggle: () {
+                        context.read<CourseProvider>().toggleFavorite(
+                          course.code,
+                        );
+                      },
+                    ),
                   );
                 }).toList(),
               ),
