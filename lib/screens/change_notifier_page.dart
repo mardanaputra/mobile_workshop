@@ -14,7 +14,7 @@ class ChangeNotifierPage extends StatefulWidget {
 
 class _ChangeNotifierPageState extends State<ChangeNotifierPage> {
   // Instansiasi class state yang terpisah dari UI
-  final CourseState _courseState = CourseState();
+  final CourseProvider _courseState = CourseProvider();
 
   @override
   void dispose() {

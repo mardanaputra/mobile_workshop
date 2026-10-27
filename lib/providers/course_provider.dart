@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CourseState extends ChangeNotifier {
+class CourseProvider extends ChangeNotifier {
   final Set<String> _favorites = {};
 
   Set<String> get favorites => _favorites;
@@ -13,7 +13,6 @@ class CourseState extends ChangeNotifier {
     } else {
       _favorites.add(code);
     }
-    // Mengirim notifikasi reaktif ke seluruh listener
     notifyListeners();
   }
 }
