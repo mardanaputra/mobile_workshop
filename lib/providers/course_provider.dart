@@ -11,19 +11,22 @@ class CourseProvider extends ChangeNotifier {
   List<Course> _courses = [];
   final Set<String> _favorites = {};
   bool _isLoading = false;
+  String? _error;
 
   List<Course> get courses => _courses;
   Set<String> get favorites => _favorites;
   bool get isLoading => _isLoading;
+  String? get error => _error;
 
   Future<void> loadCourses() async {
     _isLoading = true;
+    _error = null;
     notifyListeners();
 
     try {
       _courses = await repository.getCourses();
     } catch (e) {
-      debugPrint('Error loading courses via Repository: $e');
+      _error = e.toString().replaceAll('Exception: ', '');
     } finally {
       _isLoading = false;
       notifyListeners();
