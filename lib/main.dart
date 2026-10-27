@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/lifting_state_up_page.dart';
+import 'screens/value_notifier_page.dart';
 
 void main() {
   runApp(const CourseExplorerApp());
@@ -13,9 +13,9 @@ class CourseExplorerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Tahap 3 - Lifting State Up',
+      title: 'Tahap 4 - ValueNotifier',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-      home: const LiftingStateUpPage(),
+      home: const ValueNotifierPage(),
     );
   }
 }
