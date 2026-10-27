@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/value_notifier_page.dart';
+import 'screens/change_notifier_page.dart';
 
 void main() {
   runApp(const CourseExplorerApp());
@@ -13,9 +13,9 @@ class CourseExplorerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Tahap 4 - ValueNotifier',
+      title: 'Tahap 5 - ChangeNotifier',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-      home: const ValueNotifierPage(),
+      home: const ChangeNotifierPage(),
     );
   }
 }
