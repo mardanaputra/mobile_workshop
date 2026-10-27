@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/parent_state_owner_page.dart';
+import 'screens/lifting_state_up_page.dart';
 
 void main() {
   runApp(const CourseExplorerApp());
@@ -13,9 +13,9 @@ class CourseExplorerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Tahap 2 - Keterbatasan setState',
+      title: 'Tahap 3 - Lifting State Up',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-      home: const ParentStateOwnerPage(),
+      home: const LiftingStateUpPage(),
     );
   }
 }
