@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/course_provider.dart';
-import 'screens/service_demo_page.dart';
+import 'repositories/course_repository.dart';
+import 'screens/repository_demo_page.dart';
+import 'services/course_service.dart';
 
 void main() {
+  final courseService = CourseService();
+  final courseRepository = CourseRepository(courseService);
+
   runApp(
     ChangeNotifierProvider(
-      create: (_) => CourseProvider(),
+      create: (_) => CourseProvider(courseRepository)..loadCourses(),
       child: const CourseExplorerApp(),
     ),
   );
@@ -20,9 +25,9 @@ class CourseExplorerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Tahap 9 - Service / Data Source',
+      title: 'Tahap 10 - Repository Pattern',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-      home: ServiceDemoPage(), //
+      home: const RepositoryDemoPage(),
     );
   }
 }

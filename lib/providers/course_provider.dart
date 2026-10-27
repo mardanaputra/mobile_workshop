@@ -1,9 +1,34 @@
 import 'package:flutter/material.dart';
 
-class CourseProvider extends ChangeNotifier {
-  final Set<String> _favorites = {};
+import '../models/course.dart';
+import '../repositories/course_repository.dart';
 
+class CourseProvider extends ChangeNotifier {
+  final CourseRepository repository;
+
+  CourseProvider(this.repository);
+
+  List<Course> _courses = [];
+  final Set<String> _favorites = {};
+  bool _isLoading = false;
+
+  List<Course> get courses => _courses;
   Set<String> get favorites => _favorites;
+  bool get isLoading => _isLoading;
+
+  Future<void> loadCourses() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _courses = await repository.getCourses();
+    } catch (e) {
+      debugPrint('Error loading courses via Repository: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
   bool isFavorite(String code) => _favorites.contains(code);
 
