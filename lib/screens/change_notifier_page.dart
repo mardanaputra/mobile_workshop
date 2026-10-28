@@ -4,6 +4,8 @@ import '../providers/course_provider.dart';
 import '../repositories/course_repository.dart';
 import '../services/course_service.dart';
 
+import '../services/course_api_service.dart';
+
 const String studentName = 'Suniaramana Mardana Putra';
 const String studentId = '2455011006';
 
@@ -17,7 +19,7 @@ class ChangeNotifierPage extends StatefulWidget {
 class _ChangeNotifierPageState extends State<ChangeNotifierPage> {
   // Instansiasi CourseProvider dengan mengalirkan Repository dan Service
   final CourseProvider _courseState = CourseProvider(
-    CourseRepository(CourseService()),
+    CourseRepository(CourseApiService('https://jsonplaceholder.typicode.com')),
   );
 
   @override

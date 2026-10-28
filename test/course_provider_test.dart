@@ -2,14 +2,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_ui_fundamentals/models/course.dart';
 import 'package:flutter_ui_fundamentals/providers/course_provider.dart';
 import 'package:flutter_ui_fundamentals/repositories/course_repository.dart';
-import 'package:flutter_ui_fundamentals/services/course_service.dart';
+import 'package:flutter_ui_fundamentals/services/course_api_service.dart';
 
-// Mock Service untuk isolasi data uji
-class MockCourseService extends CourseService {
+// Mock Service menggantikan CourseApiService
+class MockCourseApiService extends CourseApiService {
+  MockCourseApiService() : super('https://mock.url');
+
   @override
-  Future<List<Course>> loadCourses() async {
+  Future<List<Course>> getCourses() async {
     return [
-      Course(
+      const Course(
         code: 'TEST01',
         title: 'Pengujian Unit Flutter',
         credits: 3,
@@ -24,7 +26,7 @@ void main() {
     late CourseProvider provider;
 
     setUp(() {
-      final mockService = MockCourseService();
+      final mockService = MockCourseApiService();
       final repository = CourseRepository(mockService);
       provider = CourseProvider(repository);
     });
