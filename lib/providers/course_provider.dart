@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../models/course.dart';
 import '../repositories/course_repository.dart';
 
@@ -9,14 +8,14 @@ class CourseProvider extends ChangeNotifier {
   CourseProvider(this.repository);
 
   List<Course> _courses = [];
-  final Set<String> _favorites = {};
   bool _isLoading = false;
   String? _error;
+  final Set<String> _favorites = {};
 
   List<Course> get courses => _courses;
-  Set<String> get favorites => _favorites;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  Set<String> get favorites => _favorites;
 
   Future<void> loadCourses() async {
     _isLoading = true;
@@ -33,8 +32,6 @@ class CourseProvider extends ChangeNotifier {
     }
   }
 
-  bool isFavorite(String code) => _favorites.contains(code);
-
   void toggleFavorite(String code) {
     if (_favorites.contains(code)) {
       _favorites.remove(code);
@@ -43,4 +40,6 @@ class CourseProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  bool isFavorite(String code) => _favorites.contains(code);
 }

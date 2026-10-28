@@ -8,7 +8,7 @@ import 'services/course_api_service.dart';
 
 const String studentName = 'Suniaramana Mardana Putra';
 const String studentId = '2455011006';
-const String apiBaseUrl = 'https://jsonplaceholder.typicode.com';
+const String apiBaseUrl = 'https://invalid-url-test.com';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
