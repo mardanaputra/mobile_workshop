@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../providers/course_provider.dart';
 import '../repositories/course_repository.dart';
-import '../services/course_service.dart';
 
 import '../services/course_api_service.dart';
 

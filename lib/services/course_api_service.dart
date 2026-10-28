@@ -32,4 +32,6 @@ class CourseApiService {
         .map((item) => Course.fromJson(item as Map<String, dynamic>))
         .toList();
   }
+
+  Future<List<Course>> loadCourses() async => getCourses();
 }

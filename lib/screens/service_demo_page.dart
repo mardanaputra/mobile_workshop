@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/course.dart';
 import '../providers/course_provider.dart';
-import '../services/course_service.dart';
+import '../services/course_api_service.dart';
 
 const String studentName = 'Suniaramana Mardana Putra';
 const String studentId = '2455011006';
@@ -16,13 +16,15 @@ class ServiceDemoPage extends StatefulWidget {
 }
 
 class _ServiceDemoPageState extends State<ServiceDemoPage> {
-  final CourseService _courseService = CourseService();
+  final CourseApiService _courseApiService = CourseApiService(
+    'https://jsonplaceholder.typicode.com',
+  );
   late Future<List<Course>> _coursesFuture;
 
   @override
   void initState() {
     super.initState();
-    _coursesFuture = _courseService.loadCourses();
+    _coursesFuture = _courseApiService.loadCourses();
   }
 
   @override
