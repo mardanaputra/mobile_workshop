@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/course_provider.dart';
-import '../widgets/course_card.dart'; // atau widget card kamu
+import '../widgets/add_course_dialog.dart'; // Import dialog tambah course
+import '../widgets/course_card.dart';
 import '../widgets/error_view.dart';
 
 class CoursesPage extends StatelessWidget {
@@ -16,6 +17,15 @@ class CoursesPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Course Data Manager')),
       body: _buildBody(context, provider),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => const AddCourseDialog(),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 

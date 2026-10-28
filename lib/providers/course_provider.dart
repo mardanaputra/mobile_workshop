@@ -9,11 +9,13 @@ class CourseProvider extends ChangeNotifier {
 
   List<Course> _courses = [];
   bool _isLoading = false;
+  bool _isSaving = false;
   String? _error;
   final Set<String> _favorites = {};
 
   List<Course> get courses => _courses;
   bool get isLoading => _isLoading;
+  bool get isSaving => _isSaving;
   String? get error => _error;
   Set<String> get favorites => _favorites;
 
@@ -28,6 +30,27 @@ class CourseProvider extends ChangeNotifier {
       _error = e.toString().replaceAll('Exception: ', '');
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> createCourse(Course course) async {
+    _isSaving = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final newCourse = await repository.createCourse(course);
+      // Masukkan data baru ke posisi teratas list lokal
+      _courses.insert(0, newCourse);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+      return false;
+    } finally {
+      _isSaving = false;
       notifyListeners();
     }
   }

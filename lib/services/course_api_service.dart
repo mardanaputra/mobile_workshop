@@ -34,4 +34,26 @@ class CourseApiService {
   }
 
   Future<List<Course>> loadCourses() async => getCourses();
+
+  Future<Course> createCourse(Course course) async {
+    final String endpoint = baseUrl.contains('jsonplaceholder')
+        ? '$baseUrl/posts'
+        : '$baseUrl/courses';
+
+    final response = await http.post(
+      Uri.parse(endpoint),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(course.toJson()),
+    );
+
+    debugPrint('HTTP Method: POST');
+    debugPrint('Status Code: ${response.statusCode}');
+    debugPrint('Response Body: ${response.body}');
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return Course.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    }
+
+    throw Exception('Gagal membuat course: HTTP ${response.statusCode}');
+  }
 }
