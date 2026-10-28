@@ -1,31 +1,46 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'models/course.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
 import 'screens/main_screen.dart';
 import 'services/course_service.dart';
 
-import 'dart:convert';
+// Identitas Mahasiswa
+const String studentName = 'Suniaramana Mardana Putra';
+const String studentId = '2455011006';
 
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
+/// Fungsi Pengujian Tahap 3 (Model Course fromJson & toJson)
+void testCourseModel() {
+  final Map<String, dynamic> sampleJson = {
+    'id': 1,
+    'code': 'MOB01',
+    'title': 'Git & GitHub',
+    'credits': 2,
+    'status': 'done',
+  };
 
-const String apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+  // Uji fromJson
+  final course = Course.fromJson(sampleJson);
 
-Future<List<dynamic>> fetchCourses() async {
-  final response = await http.get(Uri.parse(apiUrl));
-
-  if (response.statusCode == 200) {
-    final List<dynamic> data = jsonDecode(response.body);
-    debugPrint('Berhasil mengambil data. Jumlah item: ${data.length}');
-    return data;
-  } else {
-    throw Exception('Gagal memuat data: HTTP ${response.statusCode}');
-  }
+  // Print output persis sesuai format screenshot praktikum
+  debugPrint('Nama: $studentName');
+  debugPrint('NIM: $studentId');
+  debugPrint('Course toJson: ${course.toJson()}');
+  debugPrint('Course fromJson: ${course.title}');
+  debugPrint('Course code: ${course.code}');
+  debugPrint('Course credits: ${course.credits}');
+  debugPrint('Course status: ${course.status}');
 }
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Panggil pengujian model sebelum runApp
+  testCourseModel();
+
   final courseService = CourseService();
   final courseRepository = CourseRepository(courseService);
 
@@ -44,7 +59,7 @@ class CourseExplorerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Course Explorer v2',
+      title: 'Course Data Manager',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
       home: const MainScreen(),
     );
