@@ -24,7 +24,7 @@ class _ServiceDemoPageState extends State<ServiceDemoPage> {
   @override
   void initState() {
     super.initState();
-    _coursesFuture = _courseApiService.loadCourses();
+    _coursesFuture = _courseApiService.getCourses();
   }
 
   @override
@@ -123,8 +123,8 @@ class _ServiceDemoPageState extends State<ServiceDemoPage> {
                               ),
                               onPressed: () {
                                 context.read<CourseProvider>().toggleFavorite(
-                                  course.code,
-                                );
+                                      course.code,
+                                    );
                               },
                             ),
                           ],

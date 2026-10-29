@@ -1,15 +1,16 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/course.dart';
+import 'course_data_source.dart';
 
-class CourseApiService {
+class CourseApiService implements CourseDataSource {
   CourseApiService(this.baseUrl);
 
   final String baseUrl;
 
+  @override
   Future<List<Course>> getCourses() async {
     final String endpoint = baseUrl.contains('jsonplaceholder')
         ? '$baseUrl/posts'
@@ -33,8 +34,7 @@ class CourseApiService {
         .toList();
   }
 
-  Future<List<Course>> loadCourses() async => getCourses();
-
+  @override
   Future<Course> createCourse(Course course) async {
     final String endpoint = baseUrl.contains('jsonplaceholder')
         ? '$baseUrl/posts'
@@ -51,12 +51,15 @@ class CourseApiService {
     debugPrint('Response Body: ${response.body}');
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      return Course.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+      return Course.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
     }
 
     throw Exception('Gagal membuat course: HTTP ${response.statusCode}');
   }
 
+  @override
   Future<void> updateCourse(int id, Course course) async {
     final String endpoint = baseUrl.contains('jsonplaceholder')
         ? '$baseUrl/posts/$id'
@@ -77,6 +80,7 @@ class CourseApiService {
     }
   }
 
+  @override
   Future<void> deleteCourse(int id) async {
     final String endpoint = baseUrl.contains('jsonplaceholder')
         ? '$baseUrl/posts/$id'

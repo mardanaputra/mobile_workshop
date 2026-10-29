@@ -5,6 +5,7 @@ import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
 import 'screens/main_screen.dart';
 import 'services/course_api_service.dart';
+import 'services/course_data_source.dart';
 
 const String studentName = 'Suniaramana Mardana Putra';
 const String studentId = '2455011006';
@@ -13,13 +14,13 @@ const String apiBaseUrl = 'https://jsonplaceholder.typicode.com';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Gunakan CourseApiService
-  final apiService = CourseApiService(apiBaseUrl);
-  final courseRepository = CourseRepository(apiService);
+  // Memakai kontrak CourseDataSource
+  final CourseDataSource dataSource = CourseApiService(apiBaseUrl);
+  final repository = CourseRepository(dataSource);
 
   runApp(
     ChangeNotifierProvider(
-      create: (_) => CourseProvider(courseRepository)..loadCourses(),
+      create: (_) => CourseProvider(repository)..loadCourses(),
       child: const CourseExplorerApp(),
     ),
   );
@@ -33,7 +34,10 @@ class CourseExplorerApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Course Data Manager',
-      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.blue,
+      ),
       home: const MainScreen(),
     );
   }
