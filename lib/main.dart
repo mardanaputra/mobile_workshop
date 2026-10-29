@@ -23,7 +23,6 @@ Future<void> main() async {
     anonKey: supabaseAnonKey,
   );
 
-  // CUKUP GANTI BARIS INI: Dari CourseApiService ke CourseSupabaseService
   final CourseDataSource dataSource = CourseSupabaseService();
   final repository = CourseRepository(dataSource);
 
