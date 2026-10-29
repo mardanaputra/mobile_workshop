@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../models/course.dart';
 
+import '../widgets/edit_course_dialog.dart';
+
 class CourseCard extends StatelessWidget {
   final Course course;
   final bool isFavorite;
@@ -34,11 +36,13 @@ class CourseCard extends StatelessWidget {
                   : Colors.amber.shade100,
             ),
             IconButton(
-              icon: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite ? Colors.red : Colors.grey,
-              ),
-              onPressed: onFavoriteToggle,
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => EditCourseDialog(course: course),
+                );
+              },
             ),
           ],
         ),

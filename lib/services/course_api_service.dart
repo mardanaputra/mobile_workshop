@@ -56,4 +56,24 @@ class CourseApiService {
 
     throw Exception('Gagal membuat course: HTTP ${response.statusCode}');
   }
+
+  Future<void> updateCourse(int id, Course course) async {
+    final String endpoint = baseUrl.contains('jsonplaceholder')
+        ? '$baseUrl/posts/$id'
+        : '$baseUrl/courses/$id';
+
+    final response = await http.put(
+      Uri.parse(endpoint),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(course.toJson()),
+    );
+
+    debugPrint('HTTP Method: PUT');
+    debugPrint('Endpoint: $endpoint');
+    debugPrint('Status Code: ${response.statusCode}');
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('Gagal memperbarui course: HTTP ${response.statusCode}');
+    }
+  }
 }

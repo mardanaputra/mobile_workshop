@@ -65,4 +65,32 @@ class CourseProvider extends ChangeNotifier {
   }
 
   bool isFavorite(String code) => _favorites.contains(code);
+
+  Future<bool> updateCourse(int id, Course course) async {
+    _isSaving = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await repository.updateCourse(id, course);
+
+      // Perbarui data di daftar lokal
+      final index = _courses.indexWhere(
+        (c) => c.id == id || c.code == course.code,
+      );
+      if (index != -1) {
+        _courses[index] = course;
+      }
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+      return false;
+    } finally {
+      _isSaving = false;
+      notifyListeners();
+    }
+  }
 }
