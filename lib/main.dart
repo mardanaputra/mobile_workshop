@@ -11,7 +11,6 @@ import 'services/course_data_source.dart';
 const String studentName = 'Suniaramana Mardana Putra';
 const String studentId = '2455011006';
 
-// Konfigurasi Supabase Project (Ganti dengan URL & anonKey project Supabase kamu)
 const String supabaseUrl = 'https://xceedidqnlewiurkggse.supabase.co/rest/v1/';
 const String supabaseAnonKey =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjZWVkaWRxbmxld2l1cmtnZ3NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyOTE2NTQsImV4cCI6MjEwODg2NzY1NH0.XaFudn1JeTnI3gwuT0dXVY5291y9yM8QvtqOaxMxHME';
