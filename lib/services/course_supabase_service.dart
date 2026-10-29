@@ -32,7 +32,6 @@ class CourseSupabaseService implements CourseDataSource {
     await supabase.from('courses').update(course.toJson()).eq('id', id);
   }
 
-  // Implementasi DELETE ke Supabase berdasarkan ID
   @override
   Future<void> deleteCourse(int id) async {
     await supabase.from('courses').delete().eq('id', id);
