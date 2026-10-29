@@ -7,8 +7,10 @@ class CourseSupabaseService implements CourseDataSource {
 
   @override
   Future<List<Course>> getCourses() async {
-    final response =
-        await supabase.from('courses').select().order('id', ascending: true);
+    final response = await supabase
+        .from('courses')
+        .select()
+        .order('id', ascending: true);
 
     final List<dynamic> data = response as List<dynamic>;
     return data
@@ -16,13 +18,21 @@ class CourseSupabaseService implements CourseDataSource {
         .toList();
   }
 
-  // Stub sementara agar memenuhi kontrak CourseDataSource (untuk Tahap 13-15)
+  // Implementasi INSERT ke Supabase
   @override
-  Future<Course> createCourse(Course course) => throw UnimplementedError();
+  Future<Course> createCourse(Course course) async {
+    final row = await supabase
+        .from('courses')
+        .insert(course.toJson())
+        .select()
+        .single();
 
+    return Course.fromJson(row);
+  }
+
+  // Stub sementara untuk Tahap 14 dan 15
   @override
-  Future<void> updateCourse(int id, Course course) =>
-      throw UnimplementedError();
+  Future<void> updateCourse(int id, Course course) => throw UnimplementedError();
 
   @override
   Future<void> deleteCourse(int id) => throw UnimplementedError();
