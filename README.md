@@ -2,7 +2,7 @@
 
 **Nama**: Suniaramana Mardana Putra  
 **NIM**: 2455011006  
-**Mata Kuliah**: Pemrograman Mobile  
+**Mata Kuliah**: Workshop Mobile  
 
 ---
 
