@@ -93,4 +93,32 @@ class CourseProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> deleteCourse(Course course) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      // Jalankan HTTP DELETE
+      await repository.deleteCourse(course.id ?? 1);
+
+      // 1. Hapus dari daftar lokal
+      _courses.removeWhere(
+          (c) => c.code == course.code || (c.id != null && c.id == course.id));
+
+      // 2. Hapus dari favorites agar tidak ada data yatim (orphan data)
+      _favorites.remove(course.code);
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
