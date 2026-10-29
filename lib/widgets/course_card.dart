@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/course.dart';
 import '../providers/course_provider.dart';
+import 'edit_course_dialog.dart'; // Import dialog edit course
 
 class CourseCard extends StatelessWidget {
   final Course course;
@@ -30,14 +31,13 @@ class CourseCard extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
-              Navigator.pop(dialogContext); // Tutup dialog konfirmasi
+              Navigator.pop(dialogContext);
 
               final messenger = ScaffoldMessenger.of(context);
               final provider = context.read<CourseProvider>();
 
               final success = await provider.deleteCourse(course);
 
-              // Guard wajib: Periksa context.mounted setelah await
               if (!context.mounted) return;
 
               if (success) {
@@ -74,6 +74,7 @@ class CourseCard extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // 1. Tombol Favorite
             IconButton(
               icon: Icon(
                 isFavorite ? Icons.favorite : Icons.favorite_border,
@@ -81,6 +82,17 @@ class CourseCard extends StatelessWidget {
               ),
               onPressed: onFavoriteToggle,
             ),
+            // 2. Tombol Edit
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => EditCourseDialog(course: course),
+                );
+              },
+            ),
+            // 3. Tombol Delete
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
               onPressed: () => _showDeleteDialog(context),
