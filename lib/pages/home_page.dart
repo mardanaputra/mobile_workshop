@@ -6,6 +6,7 @@ import '../services/profile_service.dart';
 import '../services/kos_service.dart';
 import '../widgets/role_guard.dart';
 import 'login_page.dart';
+import 'add_kos_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -87,7 +88,8 @@ class _HomePageState extends State<HomePage> {
                   final isMine = kos['owner_id'] == myId;
 
                   return Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: ListTile(
                       title: Text(kos['name'] ?? '-'),
                       subtitle: Text(
@@ -99,13 +101,15 @@ class _HomePageState extends State<HomePage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.blue),
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.blue),
                                   onPressed: () {
                                     // TODO: Form Edit Kos
                                   },
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.red),
                                   onPressed: () async {
                                     await _kosService.deleteKos(kos['id']);
                                     setState(() {}); // Refresh tampilan
@@ -124,10 +128,15 @@ class _HomePageState extends State<HomePage> {
             role: p.role,
             allowed: const ['owner', 'admin'],
             child: FloatingActionButton.extended(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Buka form Tambah Kos')),
+              onPressed: () async {
+                // Navigasi ke halaman AddKosPage
+                final result = await Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AddKosPage()),
                 );
+                // Jika berhasil menyimpan, muat ulang state halaman utama
+                if (result == true) {
+                  setState(() {});
+                }
               },
               icon: const Icon(Icons.add_home),
               label: const Text('Tambah Kos'),
