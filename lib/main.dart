@@ -8,13 +8,18 @@ import 'screens/main_screen.dart';
 import 'services/course_data_source.dart';
 import 'services/course_supabase_service.dart'; // Impor service Supabase
 
+import 'pages/login_page.dart';
+import 'pages/home_page.dart';
+
+import 'services/auth_service.dart';
+import 'app_keys.dart';
+
 const String studentName = 'Suniaramana Mardana Putra';
 const String studentId = '2455011006';
 
 const String supabaseUrl = 'https://xceedidqnlewiurkggse.supabase.co';
 const String supabaseAnonKey =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjZWVkaWRxbmxld2l1cmtnZ3NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyOTE2NTQsImV4cCI6MjEwODg2NzY1NH0.XaFudn1JeTnI3gwuT0dXVY5291y9yM8QvtqOaxMxHME';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -41,12 +46,18 @@ class CourseExplorerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Course Data Manager',
+      title: 'KosFinder & Course Manager',
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: Colors.blue,
+        colorSchemeSeed: Colors.indigo, // Disesuaikan dengan tema worksheet
       ),
-      home: const MainScreen(),
+      navigatorKey: navigatorKey, // Dihubungkan dengan app_keys.dart
+      scaffoldMessengerKey: messengerKey, // Dihubungkan dengan app_keys.dart
+
+      // Pengecekan Session: Jika sudah login langsung ke HomePage, jika belum ke LoginPage
+      home: AuthService.instance.isLoggedIn
+          ? const HomePage()
+          : const LoginPage(),
     );
   }
 }
