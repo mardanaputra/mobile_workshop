@@ -1,8 +1,10 @@
 // lib/pages/home_page.dart
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/auth_service.dart';
 import '../services/profile_service.dart';
-import '../widgets/role_guard.dart'; // Import RoleGuard
+import '../services/kos_service.dart';
+import '../widgets/role_guard.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,6 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final Future<UserProfile?> _profileFuture;
+  final KosService _kosService = KosService();
 
   @override
   void initState() {
@@ -32,16 +35,18 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final myId = Supabase.instance.client.auth.currentUser!.id;
+
     return FutureBuilder<UserProfile?>(
       future: _profileFuture,
-      builder: (context, snap) {
-        if (snap.connectionState != ConnectionState.done) {
+      builder: (context, profileSnap) {
+        if (profileSnap.connectionState != ConnectionState.done) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        final p = snap.data;
-        if (snap.hasError || p == null) {
+        final p = profileSnap.data;
+        if (profileSnap.hasError || p == null) {
           return const Scaffold(
             body: Center(child: Text('Gagal memuat profil')),
           );
@@ -58,35 +63,63 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          // Menu yang tampil berbeda untuk tiap role
-          body: ListView(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.person),
-                title: Text(p.name.isEmpty ? p.email : p.name),
-                subtitle: Text('${p.email} • Role: ${p.role}'),
-              ),
-              const Divider(),
-              const ListTile(
-                leading: Icon(Icons.list),
-                title: Text('Daftar Kos'),
-                subtitle: Text('Semua pengguna dapat melihat daftar kos'),
-              ),
-              if (p.isOwner || p.isAdmin)
-                const ListTile(
-                  leading: Icon(Icons.home_work),
-                  title: Text('My Kos'),
-                  subtitle: Text('Kelola properti kos milik Anda'),
-                ),
-              if (p.isAdmin)
-                const ListTile(
-                  leading: Icon(Icons.admin_panel_settings),
-                  title: Text('Kelola Data (Admin)'),
-                  subtitle: Text('Fitur administratif sistem'),
-                ),
-            ],
+          // Memperbaiki tipe data FutureBuilder menjadi List>
+          body: FutureBuilder<List>(
+            future: _kosService.getKosList(),
+            builder: (context, kosSnap) {
+              if (kosSnap.connectionState != ConnectionState.done) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (kosSnap.hasError) {
+                return const Center(child: Text('Gagal memuat daftar kos'));
+              }
+
+              final items = kosSnap.data ?? [];
+
+              if (items.isEmpty) {
+                return const Center(child: Text('Belum ada data kos'));
+              }
+
+              return ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (context, i) {
+                  final kos = items[i];
+                  final isMine = kos['owner_id'] == myId;
+
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: ListTile(
+                      title: Text(kos['name'] ?? '-'),
+                      subtitle: Text(
+                        '${kos['description'] ?? '-'}\nRp ${kos['price'] ?? 0}',
+                      ),
+                      isThreeLine: true,
+                      trailing: isMine
+                          ? Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit, color: Colors.blue),
+                                  onPressed: () {
+                                    // TODO: Form Edit Kos
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () async {
+                                    await _kosService.deleteKos(kos['id']);
+                                    setState(() {}); // Refresh tampilan
+                                  },
+                                ),
+                              ],
+                            )
+                          : null,
+                    ),
+                  );
+                },
+              );
+            },
           ),
-          // Tombol "Tambah Kos" hanya untuk owner/admin
           floatingActionButton: RoleGuard(
             role: p.role,
             allowed: const ['owner', 'admin'],

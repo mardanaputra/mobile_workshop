@@ -1,41 +1,35 @@
+// lib/services/kos_service.dart
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class KosService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  String get _uid => _client.auth.currentUser!.id;
-
-  Future<List<Map<String, dynamic>>> fetchAll() async {
-    final data = await _client
+  // Mendapatkan semua daftar kos
+  Future<List<Map<String, dynamic>>> getKosList() async {
+    final response = await _client
         .from('kos')
         .select()
         .order('created_at', ascending: false);
-    return List<Map<String, dynamic>>.from(data);
+    return List<Map<String, dynamic>>.from(response);
   }
 
-  Future<void> add({
+  // Menambah kos baru
+  Future<void> addKos({
     required String name,
-    required String address,
-    required int price,
+    required String description,
+    required double price,
   }) async {
+    final userId = _client.auth.currentUser!.id;
     await _client.from('kos').insert({
-      'owner_id': _uid,
       'name': name,
-      'address': address,
+      'description': description,
       'price': price,
+      'owner_id': userId,
     });
   }
 
-  /// true = berhasil, false = ditolak RLS / data tidak ditemukan
-  Future<bool> update(String id, Map<String, dynamic> values) async {
-    final rows =
-        await _client.from('kos').update(values).eq('id', id).select();
-    return rows.isNotEmpty;
-  }
-
-  /// true = berhasil, false = ditolak RLS / data tidak ditemukan
-  Future<bool> delete(String id) async {
-    final rows = await _client.from('kos').delete().eq('id', id).select();
-    return rows.isNotEmpty;
+  // Menghapus kos berdasarkan ID
+  Future<void> deleteKos(String id) async {
+    await _client.from('kos').delete().eq('id', id);
   }
 }
