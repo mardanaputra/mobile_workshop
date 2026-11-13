@@ -14,6 +14,7 @@ import 'services/auth_service.dart'; // 2. Import auth_service.dart
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'firebase_options.dart';
+import 'services/notification_service.dart';
 
 const String studentName = 'Suniaramana Mardana Putra';
 const String studentId = '2455011006';
@@ -34,6 +35,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  NotificationService.instance.initNotificationListeners();
 
   final CourseDataSource dataSource = CourseSupabaseService();
   final repository = CourseRepository(dataSource);
