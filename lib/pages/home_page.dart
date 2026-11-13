@@ -1,5 +1,6 @@
 // lib/pages/home_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_ui_fundamentals/services/notification_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/auth_service.dart';
 import '../services/profile_service.dart';
@@ -24,7 +25,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _profileFuture = ProfileService().getMyProfile();
-    NotificationService.instance.requestPermission();
+    NotificationService.instance.requestPermission().then((_) {
+      NotificationService.instance.printFCMToken();
+    });
   }
 
   Future<void> _logout() async {
