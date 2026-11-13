@@ -1,6 +1,7 @@
+// lib/pages/home_page.dart
 import 'package:flutter/material.dart';
-
 import '../services/auth_service.dart';
+import 'login_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -8,9 +9,30 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = AuthService.instance.currentUser;
+    
     return Scaffold(
-      appBar: AppBar(title: const Text('KosFinder')),
-      body: Center(child: Text('Login sebagai: ${user?.email ?? '-'}')),
+      appBar: AppBar(
+        title: const Text('KosFinder'),
+        actions: [
+          IconButton(
+            tooltip: 'Logout',
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await AuthService.instance.logout(); // Session Removed
+              if (!context.mounted) return;
+              
+              // Redirect kembali ke LoginPage
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+                (route) => false,
+              );
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: Text('Login sebagai: ${user?.email ?? '-'}'),
+      ),
     );
   }
 }

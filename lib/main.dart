@@ -1,18 +1,17 @@
+// lib/main.dart (bagian MaterialApp)
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'app_keys.dart'; // 1. Import app_keys.dart
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
-import 'screens/main_screen.dart';
 import 'services/course_data_source.dart';
-import 'services/course_supabase_service.dart'; // Impor service Supabase
+import 'services/course_supabase_service.dart';
+import 'services/auth_service.dart'; // 2. Import auth_service.dart
 
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
-
-import 'services/auth_service.dart';
-import 'app_keys.dart';
 
 const String studentName = 'Suniaramana Mardana Putra';
 const String studentId = '2455011006';
@@ -20,6 +19,7 @@ const String studentId = '2455011006';
 const String supabaseUrl = 'https://xceedidqnlewiurkggse.supabase.co';
 const String supabaseAnonKey =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjZWVkaWRxbmxld2l1cmtnZ3NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyOTE2NTQsImV4cCI6MjEwODg2NzY1NH0.XaFudn1JeTnI3gwuT0dXVY5291y9yM8QvtqOaxMxHME';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -46,18 +46,17 @@ class CourseExplorerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'KosFinder & Course Manager',
+      title: 'KosFinder',
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: Colors.indigo, // Disesuaikan dengan tema worksheet
+        colorSchemeSeed: Colors.indigo,
       ),
-      navigatorKey: navigatorKey, // Dihubungkan dengan app_keys.dart
-      scaffoldMessengerKey: messengerKey, // Dihubungkan dengan app_keys.dart
+      navigatorKey: navigatorKey, // Dihubungkan ke app_keys.dart
+      scaffoldMessengerKey: messengerKey, // Dihubungkan ke app_keys.dart
 
-      // Pengecekan Session: Jika sudah login langsung ke HomePage, jika belum ke LoginPage
-      home: AuthService.instance.isLoggedIn
-          ? const HomePage()
-          : const LoginPage(),
+      // Pengecekan Session:
+      // Jika sudah login -> HomePage (tanpa const karena memuat state/future), jika belum -> LoginPage
+      home: AuthService.instance.isLoggedIn ? HomePage() : const LoginPage(),
     );
   }
 }
