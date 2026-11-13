@@ -1,6 +1,6 @@
+// lib/pages/register_page.dart
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../services/auth_service.dart';
 import 'home_page.dart';
 
@@ -16,6 +16,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailC = TextEditingController();
   final _passC = TextEditingController();
   final _confirmC = TextEditingController();
+  final _nameC = TextEditingController(); // Controller untuk nama
+  String _role = 'seeker'; // State default role
+
   bool _loading = false;
 
   @override
@@ -23,6 +26,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _emailC.dispose();
     _passC.dispose();
     _confirmC.dispose();
+    _nameC.dispose(); // Jangan lupa dispose controller nama
     super.dispose();
   }
 
@@ -35,20 +39,23 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _loading = true);
 
     try {
+      // Mengirimkan name dan role tambahan ke AuthService
       final res = await AuthService.instance.register(
         email: _emailC.text.trim(),
         password: _passC.text,
+        name: _nameC.text.trim(),
+        role: _role,
       );
       if (!mounted) return;
 
       if (res.session != null) {
-        // Konfirmasi email nonaktif: user langsung login -> ke Home.
+        // Konfirmasi email nonaktif: user langsung login -> ke Home[cite: 1].
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const HomePage()),
           (route) => false,
         );
       } else {
-        // Konfirmasi email aktif: minta user cek email.
+        // Konfirmasi email aktif: minta user cek email[cite: 1].
         _showMessage('Registrasi berhasil. Silakan cek email Anda.');
         Navigator.of(context).pop();
       }
@@ -71,6 +78,28 @@ class _RegisterPageState extends State<RegisterPage> {
           key: _formKey,
           child: ListView(
             children: [
+              // Input Nama
+              TextFormField(
+                controller: _nameC,
+                decoration: const InputDecoration(labelText: 'Nama'),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return 'Nama wajib diisi';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              // Dropdown Pilihan Role
+              DropdownButtonFormField<String>(
+                value: _role,
+                decoration: const InputDecoration(labelText: 'Daftar sebagai'),
+                items: const [
+                  DropdownMenuItem(value: 'seeker', child: Text('Pencari Kos')),
+                  DropdownMenuItem(value: 'owner', child: Text('Pemilik Kos')),
+                ],
+                onChanged: (v) => setState(() => _role = v ?? 'seeker'),
+              ),
+              const SizedBox(height: 12),
+              // Input Email
               TextFormField(
                 controller: _emailC,
                 keyboardType: TextInputType.emailAddress,
@@ -82,6 +111,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 },
               ),
               const SizedBox(height: 12),
+              // Input Password
               TextFormField(
                 controller: _passC,
                 obscureText: true,
@@ -93,6 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 },
               ),
               const SizedBox(height: 12),
+              // Konfirmasi Password
               TextFormField(
                 controller: _confirmC,
                 obscureText: true,
