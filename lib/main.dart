@@ -69,3 +69,20 @@ class CourseExplorerApp extends StatelessWidget {
     );
   }
 }
+
+// Di dalam lib/main.dart
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+class KosFinderApp extends StatelessWidget {
+  const KosFinderApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      navigatorKey: navigatorKey, // Daftarkan navigatorKey di sini
+      title: 'KosFinder',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const HomePage(), // atau halaman awal Anda
+    );
+  }
+}

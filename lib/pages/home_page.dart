@@ -22,13 +22,16 @@ class _HomePageState extends State<HomePage> {
   final KosService _kosService = KosService();
 
   @override
-  void initState() {
-    super.initState();
-    _profileFuture = ProfileService().getMyProfile();
-    NotificationService.instance.requestPermission().then((_) {
-      NotificationService.instance.printFCMToken();
-    });
-  }
+void initState() {
+  super.initState();
+  _profileFuture = ProfileService().getMyProfile();
+
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    // Pastikan service terinisialisasi dan jalankan interaksi notifikasi
+    await NotificationService.instance.requestPermission();
+    await NotificationService.instance.setupInteractedMessage();
+  });
+}
 
   Future<void> _logout() async {
     await AuthService.instance.logout();

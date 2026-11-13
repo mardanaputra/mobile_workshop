@@ -1,6 +1,9 @@
 // lib/services/notification_service.dart
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import '../pages/kos_detail_page.dart';
+import '../../main.dart'; // Pastikan path ini sesuai dengan struktur proyek Anda
 
 // --- TAMBAHKAN TOP-LEVEL FUNCTION INI DI LUAR CLASS ---
 @pragma('vm:entry-point')
@@ -10,6 +13,27 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   debugPrint('Handling a background message: ${message.messageId}');
   debugPrint('Background message title: ${message.notification?.title}');
   debugPrint('Background message body: ${message.notification?.body}');
+}
+
+Future<void> setupInteractedMessage(dynamic _messaging) async {
+  // 1. Ketika aplikasi TERMINATED lalu dibuka dari notifikasi
+  final initial = await _messaging.getInitialMessage();
+  if (initial != null) _handleTap(initial);
+
+  // 2. Ketika aplikasi BACKGROUND lalu dibuka dari notifikasi
+  FirebaseMessaging.onMessageOpenedApp.listen(_handleTap);
+}
+
+void _handleTap(RemoteMessage message) {
+  final kosId = message.data['kos_id'];
+  if (kosId == null) return;
+
+  // Mengarahkan pengguna ke KosDetailPage menggunakan navigatorKey
+  navigatorKey.currentState?.push(
+    MaterialPageRoute(
+      builder: (_) => KosDetailPage(kosId: kosId.toString()),
+    ),
+  );
 }
 
 class NotificationService {
@@ -45,7 +69,8 @@ class NotificationService {
     // 2. Ketika aplikasi dibuka dari kondisi terminated
     _messaging.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
-        debugPrint('App opened from terminated state: ${message.notification?.title}');
+        debugPrint(
+            'App opened from terminated state: ${message.notification?.title}');
       }
     });
 
@@ -58,7 +83,10 @@ class NotificationService {
 
     // 4. Background click listener
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('Notification clicked in background: ${message.notification?.title}');
+      debugPrint(
+          'Notification clicked in background: ${message.notification?.title}');
     });
   }
+
+  Future<void> setupInteractedMessage() async {}
 }
