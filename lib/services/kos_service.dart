@@ -32,4 +32,14 @@ class KosService {
   Future<void> deleteKos(String id) async {
     await _client.from('kos').delete().eq('id', id);
   }
+
+  Future<bool> update(String id, Map<String, dynamic> data) async {
+    try {
+      final response =
+          await _client.from('kos').update(data).eq('id', id).select();
+      return response.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
 }
